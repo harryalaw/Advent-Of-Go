@@ -68,7 +68,7 @@ func surfaceArea(w, h, l int) int {
 		minSide = sideC
 	}
 	minSide /= 2
-	return 2*w*h + 2*h*l + 2*l*w + minSide
+	return sideA + sideB + sideC + minSide
 }
 
 func volume(w, h, l int) int {
