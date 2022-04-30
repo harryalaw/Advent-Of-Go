@@ -1,23 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
+	"time"
 )
 
+func solve(part func(string) int) int {
+	value := part("data.txt")
+	println(value)
+	return value
+}
+
 func main() {
-	// println(part1("test.txt"))
-	println(part1("data.txt"))
+	start := time.Now()
+	solve(part1)
+	elapsed := time.Since(start)
+	fmt.Printf("Part1 took %s\n", elapsed)
 
-	println(part2("test.txt"))
-	println(part2("data.txt"))
+	start = time.Now()
+	solve(part2)
+	elapsed = time.Since(start)
+	fmt.Printf("Part2 took %s\n", elapsed)
 }
 
-func part1(fileName string) int {
-	return coreLogic(fileName, strconv.Unquote)
-}
-func part2(fileName string) int {
+func readFile(fileName string) ([]string, int) {
 	file, err := ioutil.ReadFile(fileName)
 
 	if err != nil {
@@ -25,6 +34,28 @@ func part2(fileName string) int {
 	}
 	words := strings.Split(string(file), "\n")
 
+	return words, len(file)
+}
+
+func part1(fileName string) int {
+	words, fileLen := readFile(fileName)
+	wordsLength := 0
+
+	for _, word := range words {
+		unquoted, err := strconv.Unquote(word)
+		if err != nil {
+			panic(err)
+		}
+		wordsLength += len(unquoted)
+	}
+
+	fileLength := fileLen - len(words) + 1
+
+	return fileLength - wordsLength
+}
+
+func part2(fileName string) int {
+	words, fileLen := readFile(fileName)
 	wordsLength := 0
 
 	for _, word := range words {
@@ -32,32 +63,7 @@ func part2(fileName string) int {
 		wordsLength += len(unquoted)
 	}
 
-	fileLength := len(file) - len(words) + 1
-	println()
+	fileLength := fileLen - len(words) + 1
 
 	return wordsLength - fileLength
-}
-
-func coreLogic(fileName string, operate func(string) (string, error)) int {
-	file, err := ioutil.ReadFile(fileName)
-
-	if err != nil {
-		panic(err)
-	}
-	words := strings.Split(string(file), "\n")
-
-	wordsLength := 0
-
-	for _, word := range words {
-		unquoted, err := operate(word)
-		if err != nil {
-			panic(err)
-		}
-		wordsLength += len(unquoted)
-	}
-
-	fileLength := len(file) - len(words) + 1
-	println()
-
-	return fileLength - wordsLength
 }
