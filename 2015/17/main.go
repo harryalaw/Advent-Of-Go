@@ -1,24 +1,17 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
-	"time"
 )
 
-func Time(function func(), part string) {
-	start := time.Now()
-	function()
-	elapsed := time.Since(start)
-	fmt.Printf("%s took %s\n", part, elapsed)
-}
-
 func main() {
-	Time(part1, "Part1")
+	util.Time(part1, "Part1")
 	// test()
-	Time(part2, "Part2")
+	util.Time(part2, "Part2")
 }
 
 func part1() {

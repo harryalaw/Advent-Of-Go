@@ -1,23 +1,17 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
 	"strings"
-	"time"
 )
 
 func main() {
 	doPart1("test.txt", 4, 6, 6)
-	Time(part1, "Part1")
+	util.Time(part1, "Part1")
 	doPart2("test.txt", 5, 6, 6)
-	Time(part2, "Part2")
-}
-func Time(function func(), part string) {
-	start := time.Now()
-	function()
-	elapsed := time.Since(start)
-	fmt.Printf("%s took %s\n", part, elapsed)
+	util.Time(part2, "Part2")
 }
 
 type coord struct {

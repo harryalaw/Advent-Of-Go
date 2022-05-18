@@ -1,20 +1,10 @@
 package main
 
-import (
-	"fmt"
-	"time"
-)
-
-func Time(function func(), part string) {
-	start := time.Now()
-	function()
-	elapsed := time.Since(start)
-	fmt.Printf("%s took %s\n", part, elapsed)
-}
+import util "2015/Util"
 
 func main() {
-	Time(Part1, "Part1")
-	Time(Part2, "Part2")
+	util.Time(Part1, "Part1")
+	util.Time(Part2, "Part2")
 }
 
 func Part1() {
