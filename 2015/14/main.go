@@ -1,6 +1,7 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -59,18 +60,18 @@ func Time(part string, function func()) {
 }
 
 func main() {
-	Time("Part1 Test", func() {
+	util.Time(func() {
 		part1("test.txt", 1000)
-	})
-	Time("Part1 actual", func() {
+	}, "Part1 Test")
+	util.Time(func() {
 		part1("data.txt", 2503)
-	})
-	Time("Part2 Test", func() {
+	}, "Part1 actual")
+	util.Time(func() {
 		part2("test.txt", 1000)
-	})
-	Time("Part2 actual", func() {
+	}, "Part2 Test")
+	util.Time(func() {
 		part2("data.txt", 2503)
-	})
+	}, "Part2 actual")
 }
 
 func part1(fileName string, time int) int {

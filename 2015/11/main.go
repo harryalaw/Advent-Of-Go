@@ -1,28 +1,21 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
 	"strings"
-	"time"
 )
-
-func Time(function func(), part string) {
-	start := time.Now()
-	function()
-	elapsed := time.Since(start)
-	fmt.Printf("%s took %s\n", part, elapsed)
-}
 
 func main() {
 	input := parseInput("data.txt")
 	var nextInput string
-	Time(func() {
+	util.Time(func() {
 		nextInput = Part1(input)
 		fmt.Println(nextInput)
 	}, "Part1")
 	nextInput = IntToStringArray(incrementValues(StringToIntArray(nextInput)))
-	Time(func() {
+	util.Time(func() {
 		fmt.Println(Part1(nextInput))
 
 	}, "Part2")

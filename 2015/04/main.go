@@ -1,6 +1,7 @@
 package main
 
 import (
+	util "2015/Util"
 	"crypto/md5"
 	"encoding/hex"
 	"fmt"
@@ -40,8 +41,8 @@ func parseInput() string {
 	return string(content)
 }
 
-func solve(part func(string) int) int {
-	return part(parseInput())
+func solve(part func(string) int) {
+	fmt.Println(part(parseInput()))
 }
 
 func test(part func(string) int, input string, expected int) bool {
@@ -63,7 +64,7 @@ func runTests(actual bool) bool {
 }
 
 func main() {
-	println(runTests(false))
-	println(solve(part1))
-	println(solve(part2))
+	fmt.Println(runTests(false))
+	util.Time(func() { solve(part1) }, "Part1")
+	util.Time(func() { solve(part2) }, "Part2")
 }

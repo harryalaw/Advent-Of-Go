@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
+	util "2015/Util"
 	"io/ioutil"
 	"strconv"
 	"strings"
-	"time"
 )
 
 func solve(part func() int) int {
@@ -15,15 +14,8 @@ func solve(part func() int) int {
 }
 
 func main() {
-	start := time.Now()
-	solve(Part1)
-	elapsed := time.Since(start)
-	fmt.Printf("Part1 took %s\n", elapsed)
-
-	start = time.Now()
-	solve(Part2)
-	elapsed = time.Since(start)
-	fmt.Printf("Part2 took %s\n", elapsed)
+	util.Time(func() { solve(Part1) }, "Part1")
+	util.Time(func() { solve(Part2) }, "Part2")
 }
 
 func parseInput() []*instruction {

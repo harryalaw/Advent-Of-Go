@@ -1,27 +1,14 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
-	"time"
 )
 
-func solve(part func() int) int {
-	value := part()
-	println(value)
-	return value
-}
-
 func main() {
-	start := time.Now()
-	solve(part1)
-	elapsed := time.Since(start)
-	fmt.Printf("Part1 took %s\n", elapsed)
-
-	start = time.Now()
-	solve(part2)
-	elapsed = time.Since(start)
-	fmt.Printf("Part2 took %s\n", elapsed)
+	util.Time(func() { fmt.Println(part1()) }, "Part1")
+	util.Time(func() { fmt.Println(part2()) }, "Part2")
 }
 
 func part1() int {

@@ -1,8 +1,15 @@
 package main
 
 import (
+	util "2015/Util"
 	"io/ioutil"
 )
+
+func main() {
+	println(tests(false))
+	util.Time(func() { solve(part1) }, "Part1")
+	util.Time(func() { solve(part2) }, "Part2")
+}
 
 func parseInput() string {
 	content, err := ioutil.ReadFile("data.txt")
@@ -118,10 +125,4 @@ func tests(actual bool) bool {
 	}
 
 	return pass1 && pass2 && pass3 && pass4 && pass5 && pass6 && passActual1 && passActual2
-}
-
-func main() {
-	println(tests(false))
-	solve(part1)
-	solve(part2)
 }

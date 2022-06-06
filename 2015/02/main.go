@@ -1,10 +1,16 @@
 package main
 
 import (
+	util "2015/Util"
 	"io/ioutil"
 	"strconv"
 	"strings"
 )
+
+func main() {
+	util.Time(part1, "Part1")
+	util.Time(part2, "Part2")
+}
 
 func parseInput() []string {
 	content, err := ioutil.ReadFile("data.txt")
@@ -84,9 +90,4 @@ func volume(w, h, l int) int {
 		minPerim = perimC
 	}
 	return w*h*l + minPerim
-}
-
-func main() {
-	part1()
-	part2()
 }

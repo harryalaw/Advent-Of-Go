@@ -1,6 +1,7 @@
 package main
 
 import (
+	util "2015/Util"
 	"fmt"
 	"io/ioutil"
 	"strconv"
@@ -8,11 +9,11 @@ import (
 )
 
 func main() {
+	util.Time(func() { part1("test.txt") }, "Part1 Test")
+	util.Time(func() { part1("data.txt") }, "Part1")
 
-	part1("test.txt")
-	part1("data.txt")
-	part2("test.txt")
-	part2("data.txt")
+	util.Time(func() { part2("test.txt") }, "Part2 Test")
+	util.Time(func() { part2("data.txt") }, "Part2")
 
 }
 

@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
+	util "2015/Util"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 type instruction struct {
@@ -140,15 +139,8 @@ func countGrid(grid *[][]int) int {
 }
 
 func main() {
-	start := time.Now()
-	solve(part1)
-	elapsed := time.Since(start)
-	fmt.Printf("Part1 took %s\n", elapsed)
-
-	start = time.Now()
-	solve(part2)
-	elapsed = time.Since(start)
-	fmt.Printf("Part2 took %s\n", elapsed)
+	util.Time(func() { solve(part1) }, "Part1")
+	util.Time(func() { solve(part2) }, "Part2")
 }
 
 func test() {
@@ -172,7 +164,7 @@ func test1() {
 	list := make([]instruction, 1)
 	list[0] = *inst
 
-	println(1000*1000 == part1(list))
+	println(part1(list) == 1000*1000)
 }
 func test2() {
 	inst := new(instruction)
@@ -184,7 +176,7 @@ func test2() {
 	list := make([]instruction, 1)
 	list[0] = *inst
 
-	println(1000 == part1(list))
+	println(part1(list) == 1000)
 }
 
 func test3() {
@@ -206,7 +198,7 @@ func test3() {
 	list[0] = *inst
 	list[1] = *inst2
 
-	println(1000*1000-4 == part1(list))
+	println(part1(list) == 1000*1000-4)
 }
 
 func test4() {
@@ -219,13 +211,13 @@ func test4() {
 	list := make([]instruction, 1)
 	list[0] = *inst
 
-	println(1 == part2(list))
+	println(part2(list) == 1)
 }
 func test5() {
 	list := make([]instruction, 1)
 	list[0] = stringToInstruction("toggle 0,0 through 999,999")
 
-	println(2000000 == part2(list))
+	println(part2(list) == 2000000)
 }
 
 func actual() {

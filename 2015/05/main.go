@@ -1,11 +1,10 @@
 package main
 
 import (
-	"fmt"
+	util "2015/Util"
 	"io/ioutil"
 	"regexp"
 	"strings"
-	"time"
 )
 
 func solve(part func([]string) int) int {
@@ -123,15 +122,8 @@ func oneGap(line string) bool {
 }
 
 func main() {
-	start := time.Now()
-	solve(part1)
-	elapsed := time.Since(start)
-	fmt.Printf("Part1 took %s\n", elapsed)
-
-	start = time.Now()
-	solve(part2)
-	elapsed = time.Since(start)
-	fmt.Printf("Part2 took %s\n", elapsed)
+	util.Time(func() { solve(part1) }, "Part1")
+	util.Time(func() { solve(part2) }, "Part2")
 }
 
 func test() {

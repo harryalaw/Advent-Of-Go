@@ -29,6 +29,7 @@ func TestCoreLogic(t *testing.T) {
 	checkValue(t, "y", knownValues, 456)
 
 }
+
 func checkValue(t *testing.T, key string, knownValues map[string]int, expected int) {
 	actual, isPresent := knownValues[key]
 
