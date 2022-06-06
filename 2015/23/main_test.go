@@ -19,7 +19,7 @@ func Test_performOperations(t *testing.T) {
 			args: args{
 				instructions: []instruction{
 					{name: "inc", value: "a"},
-					{name: "jio", value: "a", third: "+2"},
+					{name: "jio", value: "a", third: +2},
 					{name: "tpl", value: "a"},
 					{name: "inc", value: "a"},
 				},
@@ -31,7 +31,7 @@ func Test_performOperations(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := performOperations(tt.args.instructions)
+			got, got1 := performOperations(0, 0, tt.args.instructions)
 			if got != tt.want {
 				t.Errorf("performOperations() got = %v, want %v", got, tt.want)
 			}
