@@ -91,72 +91,6 @@ func Test_part2(t *testing.T) {
 	}
 }
 
-func Test_sumToK(t *testing.T) {
-	type args struct {
-		numbers []int
-		k       int
-	}
-	tests := []struct {
-		name string
-		args args
-		want [][]int
-	}{
-		{
-			name: "1-5 sum to 4",
-			args: args{
-				numbers: []int{1, 2, 3, 4, 5},
-				k:       4,
-			},
-			want: [][]int{{1, 3}, {4}},
-		},
-		{
-			name: "1-5 sum to 15",
-			args: args{
-				numbers: []int{1, 2, 3, 4, 5},
-				k:       15,
-			},
-			want: [][]int{{1, 2, 3, 4, 5}},
-		},
-		{
-			name: "1-10 sum to 10",
-			args: args{
-				numbers: []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
-				k:       10,
-			},
-			want: [][]int{
-				{1, 2, 3, 4}, {1, 2, 7}, {1, 3, 6},
-				{1, 4, 5}, {1, 9}, {2, 3, 5},
-				{2, 8}, {3, 7}, {4, 6}, {10},
-			},
-		},
-		{
-			name: "Longer sum after valid sum",
-			args: args{
-				numbers: []int{9, 3, 2, 1},
-				k:       12,
-			},
-			want: [][]int{
-				{9, 3}, {9, 2, 1},
-			},
-		},
-		{
-			name: "Descending values that don't sum to target",
-			args: args{
-				numbers: []int{5, 4, 3, 2, 1},
-				k:       20,
-			},
-			want: [][]int{},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := sumToK(tt.args.numbers, tt.args.k); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("sumToK() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_sumToKPruned(t *testing.T) {
 	type args struct {
 		numbers []int
@@ -221,21 +155,6 @@ func Test_sumToKPruned(t *testing.T) {
 			if got := sumToKPruned(tt.args.numbers, tt.args.k); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("sumToKPruned() = %v, want %v", got, tt.want)
 			}
-		})
-	}
-}
-
-func Test_doPart2(t *testing.T) {
-	tests := []struct {
-		name string
-	}{
-		{
-			name: "Test",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			doPart2()
 		})
 	}
 }

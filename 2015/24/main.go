@@ -44,38 +44,6 @@ func parseInput(fileName string) []int {
 	return numbers
 }
 
-// find all subsets of an int array that sum to K
-func sumToK(numbers []int, k int) [][]int {
-	out := make([][]int, 0)
-
-	for i, number := range numbers {
-		attempt := []int{number}
-		out = recursiveSumToK(numbers[i+1:], attempt, k, out)
-	}
-
-	return out
-}
-
-func recursiveSumToK(numbers []int, attempt []int, k int, out [][]int) [][]int {
-	total := sumArray(attempt)
-	if total == k {
-		tempAttempt := copyInts(attempt)
-		out = append(out, tempAttempt)
-		return out
-	}
-	if len(numbers) == 0 {
-		return out
-	}
-
-	for i, number := range numbers {
-		if total+number <= k {
-			tempAttempt := append(attempt, number)
-			out = recursiveSumToK(numbers[i+1:], tempAttempt, k, out)
-		}
-	}
-	return out
-}
-
 func sumToKPruned(numbers []int, k int) [][]int {
 	out := make([][]int, 0)
 
@@ -95,7 +63,8 @@ func recursiveSumToKPruned(numbers, attempt []int, k int, out [][]int, minLength
 			*minLength = len(attempt)
 		}
 
-		tempAttempt := copyInts(attempt)
+		tempAttempt := make([]int, len(attempt))
+		copy(tempAttempt, attempt)
 		out = append(out, tempAttempt)
 		return out
 	}
@@ -130,61 +99,33 @@ func multiplyArray(array []int) int {
 }
 
 func part1(numbers []int) int {
-	numbers = sortDescending(numbers)
-	target := sumArray(numbers)
-	if target%3 != 0 {
-		panic("Not divisible by 3")
-	}
-	target /= 3
-
-	partitions := sumToKPruned(numbers, target)
-
-	minLength := len(numbers)
-	quantumEntanglement := math.MaxInt64
-	for _, sum := range partitions {
-		if len(sum) > minLength {
-			continue
-		}
-		tempQE := multiplyArray(sum)
-		if tempQE < quantumEntanglement || len(sum) < minLength {
-			quantumEntanglement = tempQE
-		}
-
-		minLength = len(sum)
-	}
-	return quantumEntanglement
+	return coreLogic(numbers, 3)
 }
 
 func part2(numbers []int) int {
+	return coreLogic(numbers, 4)
+}
+
+func coreLogic(numbers []int, partitionCount int) int {
 	numbers = sortDescending(numbers)
+
 	target := sumArray(numbers)
-	if target%4 != 0 {
-		panic("Not divisible by 4")
+	if target%partitionCount != 0 {
+		fmt.Println("Partition count:", partitionCount)
+		panic("Not divisible by partitionCount")
 	}
-	target /= 4
+	target /= partitionCount
 
 	partitions := sumToKPruned(numbers, target)
 
-	minLength := len(numbers)
 	quantumEntanglement := math.MaxInt64
-	var finalPartition []int
 
-	for i := len(partitions) - 1; i >= 0; i-- {
-		sum := partitions[i]
-		if len(sum) > minLength || sumArray(sum) != target {
-			continue
-		}
+	for _, sum := range partitions {
 		tempQE := multiplyArray(sum)
-		if tempQE < quantumEntanglement || len(sum) < minLength {
+		if tempQE < quantumEntanglement {
 			quantumEntanglement = tempQE
-			finalPartition = sum
-		}
-
-		if len(sum) < minLength {
-			minLength = len(sum)
 		}
 	}
-	fmt.Printf("Final Partition: %+v\n", finalPartition)
 	return quantumEntanglement
 }
 
@@ -198,14 +139,4 @@ func sortDescending(numbers []int) []int {
 	}
 
 	return sorted
-}
-
-func copyInts(numbers []int) []int {
-	out := make([]int, len(numbers))
-
-	for i, number := range numbers {
-		out[i] = number
-	}
-
-	return out
 }
