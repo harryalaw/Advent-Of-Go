@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"sort"
 	"strings"
 )
 
@@ -43,7 +44,7 @@ func parseInput(fileName string) []int {
 	return numbers
 }
 
-// find all subsets of numbers that sum to K
+// find all subsets of an int array that sum to K
 func sumToK(numbers []int, k int) [][]int {
 	out := make([][]int, 0)
 
@@ -58,7 +59,11 @@ func sumToK(numbers []int, k int) [][]int {
 func recursiveSumToK(numbers []int, attempt []int, k int, out [][]int) [][]int {
 	total := sumArray(attempt)
 	if total == k {
-		out = append(out, attempt)
+		tempAttempt := copyInts(attempt)
+		out = append(out, tempAttempt)
+		return out
+	}
+	if len(numbers) == 0 {
 		return out
 	}
 
@@ -66,6 +71,39 @@ func recursiveSumToK(numbers []int, attempt []int, k int, out [][]int) [][]int {
 		if total+number <= k {
 			tempAttempt := append(attempt, number)
 			out = recursiveSumToK(numbers[i+1:], tempAttempt, k, out)
+		}
+	}
+	return out
+}
+
+func sumToKPruned(numbers []int, k int) [][]int {
+	out := make([][]int, 0)
+
+	minlength := len(numbers)
+	for i, number := range numbers {
+		attempt := []int{number}
+		out = recursiveSumToKPruned(numbers[i+1:], attempt, k, out, &minlength)
+	}
+	return out
+}
+
+func recursiveSumToKPruned(numbers, attempt []int, k int, out [][]int, minLength *int) [][]int {
+	total := sumArray(attempt)
+	if total == k && len(attempt) <= *minLength {
+		if len(attempt) < *minLength {
+			out = make([][]int, 0)
+			*minLength = len(attempt)
+		}
+
+		tempAttempt := copyInts(attempt)
+		out = append(out, tempAttempt)
+		return out
+	}
+
+	for i, number := range numbers {
+		if total+number <= k && len(attempt) < *minLength {
+			tempAttempt := append(attempt, number)
+			out = recursiveSumToKPruned(numbers[i+1:], tempAttempt, k, out, minLength)
 		}
 	}
 	return out
@@ -92,18 +130,18 @@ func multiplyArray(array []int) int {
 }
 
 func part1(numbers []int) int {
+	numbers = sortDescending(numbers)
 	target := sumArray(numbers)
 	if target%3 != 0 {
 		panic("Not divisible by 3")
 	}
 	target /= 3
 
-	partitions := sumToK(numbers, target)
+	partitions := sumToKPruned(numbers, target)
 
 	minLength := len(numbers)
 	quantumEntanglement := math.MaxInt64
-	for i := len(partitions) - 1; i >= 0; i-- {
-		sum := partitions[i]
+	for _, sum := range partitions {
 		if len(sum) > minLength {
 			continue
 		}
@@ -118,27 +156,56 @@ func part1(numbers []int) int {
 }
 
 func part2(numbers []int) int {
+	numbers = sortDescending(numbers)
 	target := sumArray(numbers)
 	if target%4 != 0 {
 		panic("Not divisible by 4")
 	}
 	target /= 4
 
-	partitions := sumToK(numbers, target)
+	partitions := sumToKPruned(numbers, target)
 
 	minLength := len(numbers)
 	quantumEntanglement := math.MaxInt64
+	var finalPartition []int
+
 	for i := len(partitions) - 1; i >= 0; i-- {
 		sum := partitions[i]
-		if len(sum) > minLength {
+		if len(sum) > minLength || sumArray(sum) != target {
 			continue
 		}
 		tempQE := multiplyArray(sum)
 		if tempQE < quantumEntanglement || len(sum) < minLength {
 			quantumEntanglement = tempQE
+			finalPartition = sum
 		}
 
-		minLength = len(sum)
+		if len(sum) < minLength {
+			minLength = len(sum)
+		}
 	}
+	fmt.Printf("Final Partition: %+v\n", finalPartition)
 	return quantumEntanglement
+}
+
+func sortDescending(numbers []int) []int {
+	tempNumbers := numbers
+	sort.Ints(tempNumbers)
+
+	sorted := make([]int, len(tempNumbers))
+	for i := 0; i < len(tempNumbers); i++ {
+		sorted[len(tempNumbers)-i-1] = tempNumbers[i]
+	}
+
+	return sorted
+}
+
+func copyInts(numbers []int) []int {
+	out := make([]int, len(numbers))
+
+	for i, number := range numbers {
+		out[i] = number
+	}
+
+	return out
 }
