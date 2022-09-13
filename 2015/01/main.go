@@ -2,8 +2,8 @@ package main
 
 import (
 	_ "embed"
-	"github.com/harryalaw/advent-of-go/util"
 	"fmt"
+	"github.com/harryalaw/advent-of-go/util"
 )
 
 func main() {

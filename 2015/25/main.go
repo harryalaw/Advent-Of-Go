@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/harryalaw/advent-of-go/util"
 	"fmt"
+	"github.com/harryalaw/advent-of-go/util"
 	"io/ioutil"
 	"regexp"
 	"strings"
@@ -24,17 +24,16 @@ func doPart1() {
 }
 
 func part1(target coord) int {
-	pos := coord{row:1, col:1}
-	currentValue := 20151125;
+	pos := coord{row: 1, col: 1}
+	currentValue := 20151125
 
 	MULTIPLIER := 252533
 	DIVIDER := 33554393
 
 	for (pos.row != target.row) || (pos.col != target.col) {
 		currentValue = (currentValue * MULTIPLIER) % DIVIDER
-		pos = nextCoord(pos);
+		pos = nextCoord(pos)
 	}
-
 
 	return currentValue
 }

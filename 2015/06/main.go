@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "embed"
 	"github.com/harryalaw/advent-of-go/util"
-	_"embed"
 	"regexp"
 	"strconv"
 	"strings"

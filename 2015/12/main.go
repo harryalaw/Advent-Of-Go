@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/harryalaw/advent-of-go/util"
 	"encoding/json"
 	"fmt"
+	"github.com/harryalaw/advent-of-go/util"
 	"io/ioutil"
 )
 

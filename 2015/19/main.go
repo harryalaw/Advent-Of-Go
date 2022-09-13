@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/harryalaw/advent-of-go/util"
 	"fmt"
+	"github.com/harryalaw/advent-of-go/util"
 	"io/ioutil"
 	"regexp"
 	"strings"
