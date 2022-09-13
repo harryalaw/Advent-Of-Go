@@ -1,8 +1,8 @@
 package main
 
 import (
-	util "2015/Util"
-	"io/ioutil"
+	_ "embed"
+	"github.com/harryalaw/advent-of-go/util"
 	"regexp"
 	"strings"
 )
@@ -13,13 +13,11 @@ func solve(part func([]string) int) int {
 	return result
 }
 
-func parseInput() []string {
-	content, err := ioutil.ReadFile("data.txt")
-	if err != nil {
-		panic(err)
-	}
+//go:embed data.txt
+var input string
 
-	return strings.Split(string(content), "\n")
+func parseInput() []string {
+	return strings.Split(input, "\n")
 }
 
 func part1(input []string) int {

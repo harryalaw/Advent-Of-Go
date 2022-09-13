@@ -1,8 +1,8 @@
 package main
 
 import (
-	util "2015/Util"
-	"io/ioutil"
+	"github.com/harryalaw/advent-of-go/util"
+	_"embed"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,14 +16,11 @@ type instruction struct {
 	y2    int
 }
 
+//go:embed data.txt
+var input string
+
 func parseInput() []instruction {
-	content, err := ioutil.ReadFile("data.txt")
-
-	if err != nil {
-		panic(err)
-	}
-
-	lines := splitNewLines(string(content))
+	lines := splitNewLines(input)
 
 	out := make([]instruction, len(lines))
 

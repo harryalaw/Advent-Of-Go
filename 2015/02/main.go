@@ -1,8 +1,8 @@
 package main
 
 import (
-	util "2015/Util"
-	"io/ioutil"
+	_ "embed"
+	"github.com/harryalaw/advent-of-go/util"
 	"strconv"
 	"strings"
 )
@@ -12,13 +12,11 @@ func main() {
 	util.Time(part2, "Part2")
 }
 
-func parseInput() []string {
-	content, err := ioutil.ReadFile("data.txt")
+//go:embed data.txt
+var input string
 
-	if err != nil {
-		panic(err)
-	}
-	lines := splitOnNewLines(string(content))
+func parseInput() []string {
+	lines := splitOnNewLines(string(input))
 	return lines
 }
 

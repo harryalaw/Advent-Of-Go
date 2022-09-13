@@ -1,7 +1,7 @@
 package main
 
 import (
-	util "2015/util"
+	"github.com/harryalaw/advent-of-go/util"
 	"fmt"
 	"io/ioutil"
 	"strings"
