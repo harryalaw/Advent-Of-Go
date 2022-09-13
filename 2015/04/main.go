@@ -1,13 +1,16 @@
 package main
 
 import (
-	"github.com/harryalaw/advent-of-go/util"
 	"crypto/md5"
+	_ "embed"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
+	"github.com/harryalaw/advent-of-go/util"
 	"strings"
 )
+
+//go:embed data.txt
+var input string
 
 func getMD5Hash(text string) string {
 	hash := md5.Sum([]byte(text))
@@ -32,17 +35,8 @@ func part2(input string) int {
 	return solveHash("000000", input)
 }
 
-func parseInput() string {
-	content, err := ioutil.ReadFile("data.txt")
-
-	if err != nil {
-		panic(err)
-	}
-	return string(content)
-}
-
 func solve(part func(string) int) {
-	fmt.Println(part(parseInput()))
+	fmt.Println(part(input))
 }
 
 func test(part func(string) int, input string, expected int) bool {
@@ -57,8 +51,8 @@ func runTests(actual bool) bool {
 	test3 := true
 	test4 := true
 	if actual {
-		test3 = test(part1, parseInput(), 254575)
-		test4 = test(part2, parseInput(), 1038736)
+		test3 = test(part1, input, 254575)
+		test4 = test(part2, input, 1038736)
 	}
 	return test1 && test2 && test3 && test4
 }

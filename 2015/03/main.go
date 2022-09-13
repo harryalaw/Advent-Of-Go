@@ -1,8 +1,8 @@
 package main
 
 import (
+	_ "embed"
 	"github.com/harryalaw/advent-of-go/util"
-	"io/ioutil"
 )
 
 func main() {
@@ -11,15 +11,8 @@ func main() {
 	util.Time(func() { solve(part2) }, "Part2")
 }
 
-func parseInput() string {
-	content, err := ioutil.ReadFile("data.txt")
-
-	if err != nil {
-		panic(err)
-	}
-
-	return string(content)
-}
+//go:embed data.txt
+var input string
 
 type coord struct {
 	x int
@@ -27,7 +20,7 @@ type coord struct {
 }
 
 func solve(part func(string) int) int {
-	value := part(parseInput())
+	value := part(input)
 	println(value)
 	return value
 }
@@ -99,12 +92,12 @@ func test6() bool {
 }
 
 func actual1() bool {
-	result := part1(parseInput())
+	result := part1(input)
 	return result == 2572
 }
 
 func actual2() bool {
-	result := part2(parseInput())
+	result := part2(input)
 	return result == 2631
 }
 

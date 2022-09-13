@@ -1,9 +1,9 @@
 package main
 
 import (
+	_ "embed"
 	"github.com/harryalaw/advent-of-go/util"
 	"fmt"
-	"io/ioutil"
 )
 
 func main() {
@@ -11,12 +11,13 @@ func main() {
 	util.Time(func() { fmt.Println(part2()) }, "Part2")
 }
 
-func part1() int {
-	content, _ := ioutil.ReadFile("data.txt")
+//go:embed "data.txt"
+var input string
 
+func part1() int {
 	floor := 0
 
-	for _, char := range string(content) {
+	for _, char := range input {
 		if char == '(' {
 			floor++
 		} else {
@@ -27,11 +28,9 @@ func part1() int {
 }
 
 func part2() int {
-	content, _ := ioutil.ReadFile("data.txt")
-
 	floor := 0
 
-	for index, char := range string(content) {
+	for index, char := range input {
 		if char == '(' {
 			floor++
 		} else {
