@@ -1,7 +1,7 @@
 package main
 
 import (
-	util "2015/Util"
+	"github.com/harryalaw/advent-of-go/util"
 	"io/ioutil"
 	"strconv"
 	"strings"

@@ -1,6 +1,6 @@
 package main
 
-import util "2015/Util"
+import "github.com/harryalaw/advent-of-go/util"
 
 func main() {
 	util.Time(Part1, "Part1")
