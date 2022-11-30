@@ -2,8 +2,6 @@ YEAR=$ADVENT_YEAR
 USER_DAY=$1
 
 if [[ ${#USER_DAY} == 1 ]]; then
-  echo $USER_DAY
-  echo ${#USER_DAY}
   DAY="0$USER_DAY"
 elif [[ ${#USER_DAY} == 2 ]]; then
   DAY=$USER_DAY
