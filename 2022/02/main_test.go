@@ -9,10 +9,10 @@ import (
 var testData string
 
 func TestParseInput(t *testing.T) {
-	expected := []RPS{
-		{opponent: "A", player: "Y"},
-		{opponent: "B", player: "X"},
-		{opponent: "C", player: "Z"},
+	expected := []string{
+		"A Y",
+		"B X",
+		"C Z",
 	}
 
 	parsedInput := parseInput(testData)
@@ -22,11 +22,8 @@ func TestParseInput(t *testing.T) {
 	}
 
 	for i, actual := range parsedInput {
-		if actual.opponent != expected[i].opponent {
-			t.Errorf("opponent incorrect, expected=%s got=%s", expected[i], actual)
-		}
-		if actual.player != expected[i].player {
-			t.Errorf("player incorrect, expected=%s got=%s", expected[i], actual)
+		if actual != expected[i] {
+			t.Errorf("game state incorrect, expected=%s got=%s", expected[i], actual)
 		}
 	}
 }
