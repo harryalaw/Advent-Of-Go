@@ -24,10 +24,16 @@ fi
 # Get advent of code data
 if [[ -z $ADVENT_COOKIE ]]; then
   echo "Please provide cookie for advent of code"
+  echo "This can be done by setting the ADVENT_COOKIE env variable"
   return
 fi
 
-RES=$(curl -s https://adventofcode.com/$YEAR/day/$USER_DAY/input --cookie session=$ADVENT_COOKIE)
+if [[ -z $ADVENT_USER ]]; then
+  echo "Please set ADVENT_USER variable for user-agent header"
+  return
+fi
+
+RES=$(curl -A "$ADVENT_USER using curl" -s https://adventofcode.com/$YEAR/day/$USER_DAY/input --cookie session=$ADVENT_COOKIE)
 
 ERROR_TEXT="Puzzle inputs differ by user. Please log in to get your puzzle input."
 
