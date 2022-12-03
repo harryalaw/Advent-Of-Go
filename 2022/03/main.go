@@ -46,6 +46,22 @@ func Part1(data []string) int {
 	return total
 }
 
+func Part2(data []string) int {
+	total := 0
+
+	for i := 0; i < len(data)-2; i += 3 {
+		firstBag := getLetters(data[i])
+		secondBag := getLetters(data[i+1])
+		thirdBag := getLetters(data[i+2])
+
+		joinedBag := findCommonLetters(firstBag, secondBag)
+
+		total += findCommonLetter(joinedBag, thirdBag) + 1
+	}
+
+	return total
+}
+
 func findCommonLetter(a, b [52]bool) int {
 	for i, value := range a {
 		if value && b[i] {
@@ -77,18 +93,4 @@ func getLetters(item string) [52]bool {
 	}
 
 	return out
-}
-
-func Part2(data []string) int {
-	total := 0
-
-	for i := 0; i < len(data)-2; i += 3 {
-		firstBag := getLetters(data[i])
-		secondBag := getLetters(data[i+1])
-		thirdBag := getLetters(data[i+2])
-
-		total += findCommonLetter(findCommonLetters(firstBag, secondBag), thirdBag) + 1
-	}
-
-	return total
 }
