@@ -159,10 +159,7 @@ func Part2(moves []Move) int {
 		for i := 0; i < move.amount; i++ {
 			dir := directionToCoord(move.direction)
 			snake[0] = snake[0].Add(*dir)
-			for i := range snake {
-				if i == 0 {
-					continue
-				}
+			for i := 1; i < len(snake); i++ {
 				snake[i] = advanceTail(snake[i-1], snake[i])
 			}
 			visited[snake[9].Hash()] = struct{}{}
