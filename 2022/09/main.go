@@ -1,10 +1,8 @@
 package main
 
 import (
-	"bytes"
 	_ "embed"
 	"fmt"
-	"strconv"
 	"strings"
 
 	util "github.com/harryalaw/advent-of-go/util"
@@ -23,12 +21,8 @@ type Coord struct {
 	y int
 }
 
-func (c *Coord) String() string {
-	var out bytes.Buffer
-	out.WriteString(strconv.Itoa(c.x))
-	out.WriteString(" ")
-	out.WriteString(strconv.Itoa(c.y))
-	return out.String()
+func (c *Coord) Hash() int {
+	return c.x + 100000*c.y
 }
 
 func (c *Coord) Add(o Coord) Coord {
@@ -96,17 +90,17 @@ func doPart2() {
 }
 
 func Part1(moves []Move) int {
-	visited := map[string]bool{}
+	visited := map[int]bool{}
 	head := Coord{0, 0}
 	tail := Coord{0, 0}
-	visited[tail.String()] = true
+	visited[tail.Hash()] = true
 
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
 			dir := directionToCoord(move.direction)
 			head = head.Add(*dir)
 			tail = advanceTail(head, tail)
-			visited[tail.String()] = true
+			visited[tail.Hash()] = true
 		}
 	}
 
@@ -153,13 +147,13 @@ func advanceTail(head, tail Coord) Coord {
 }
 
 func Part2(moves []Move) int {
-	visited := map[string]bool{}
+	visited := map[int]bool{}
 	snake := [10]Coord{}
 	for i := range snake {
 		snake[i] = Coord{0, 0}
 	}
 	tail := snake[9]
-	visited[tail.String()] = true
+	visited[tail.Hash()] = true
 
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
@@ -171,7 +165,7 @@ func Part2(moves []Move) int {
 				}
 				snake[i] = advanceTail(snake[i-1], snake[i])
 			}
-			visited[snake[9].String()] = true
+			visited[snake[9].Hash()] = true
 		}
 	}
 
