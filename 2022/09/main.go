@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	_ "embed"
 	"fmt"
+	"strconv"
 	"strings"
 
 	util "github.com/harryalaw/advent-of-go/util"
@@ -22,20 +24,20 @@ type Coord struct {
 }
 
 func (c *Coord) String() string {
-	return fmt.Sprintf("%d %d", c.x, c.y)
+	var out bytes.Buffer
+	out.WriteString(strconv.Itoa(c.x))
+	out.WriteString(" ")
+	out.WriteString(strconv.Itoa(c.y))
+	return out.String()
 }
 
-func (c *Coord) Equals(o *Coord) bool {
-	return c.x == o.x && c.y == o.y
-}
-
-func (c *Coord) Add(o *Coord) Coord {
+func (c *Coord) Add(o Coord) Coord {
 	newX := c.x + o.x
 	newY := c.y + o.y
 	return Coord{x: newX, y: newY}
 }
 
-func (c *Coord) Subtract(o *Coord) Coord {
+func (c *Coord) Sub(o Coord) Coord {
 	newX := c.x - o.x
 	newY := c.y - o.y
 	return Coord{x: newX, y: newY}
@@ -102,7 +104,7 @@ func Part1(moves []Move) int {
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
 			dir := directionToCoord(move.direction)
-			head = head.Add(dir)
+			head = head.Add(*dir)
 			tail = advanceTail(head, tail)
 			visited[tail.String()] = true
 		}
@@ -131,7 +133,7 @@ func directionToCoord(dir string) *Coord {
 }
 
 func advanceTail(head, tail Coord) Coord {
-	difference := head.Subtract(&tail)
+	difference := head.Sub(tail)
 	mag := difference.Euclid()
 	if mag < 3 {
 		return tail
@@ -139,7 +141,7 @@ func advanceTail(head, tail Coord) Coord {
 	difference.Normalize()
 	// H . T
 	if mag == 4 {
-		return tail.Add(&difference)
+		return tail.Add(difference)
 	}
 	// H . .
 	// . . T
@@ -147,7 +149,7 @@ func advanceTail(head, tail Coord) Coord {
 	// H .
 	// . .
 	// . T
-	return tail.Add(&difference)
+	return tail.Add(difference)
 }
 
 func Part2(moves []Move) int {
@@ -162,7 +164,7 @@ func Part2(moves []Move) int {
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
 			dir := directionToCoord(move.direction)
-			snake[0] = snake[0].Add(dir)
+			snake[0] = snake[0].Add(*dir)
 			for i := range snake {
 				if i == 0 {
 					continue
