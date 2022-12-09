@@ -12,7 +12,7 @@ import (
 var input string
 
 type Move struct {
-	direction string
+	direction *Coord
 	amount    int
 }
 
@@ -59,6 +59,25 @@ func (c *Coord) Normalize() {
 	}
 }
 
+var up = Coord{x: 0, y: 1}
+var down = Coord{x: 0, y: -1}
+var left = Coord{x: -1, y: 0}
+var right = Coord{x: 1, y: 0}
+
+func directionToCoord(dir string) *Coord {
+	switch dir {
+	case "U":
+		return &up
+	case "D":
+		return &down
+	case "L":
+		return &left
+	case "R":
+		return &right
+	}
+	panic("No such direction")
+}
+
 func parseInput(input string) []Move {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	moves := make([]Move, len(lines))
@@ -66,7 +85,7 @@ func parseInput(input string) []Move {
 	for i, move := range lines {
 		parts := strings.Fields(move)
 		moves[i] = Move{
-			direction: parts[0],
+			direction: directionToCoord(parts[0]),
 			amount:    util.Atoi(parts[1]),
 		}
 	}
@@ -97,8 +116,7 @@ func Part1(moves []Move) int {
 
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
-			dir := directionToCoord(move.direction)
-			head = head.Add(*dir)
+			head = head.Add(*move.direction)
 			tail = advanceTail(head, tail)
 			visited[tail.Hash()] = struct{}{}
 		}
@@ -107,23 +125,26 @@ func Part1(moves []Move) int {
 	return len(visited)
 }
 
-var up = Coord{x: 0, y: 1}
-var down = Coord{x: 0, y: -1}
-var left = Coord{x: -1, y: 0}
-var right = Coord{x: 1, y: 0}
-
-func directionToCoord(dir string) *Coord {
-	switch dir {
-	case "U":
-		return &up
-	case "D":
-		return &down
-	case "L":
-		return &left
-	case "R":
-		return &right
+func Part2(moves []Move) int {
+	visited := map[int]struct{}{}
+	snake := [10]Coord{}
+	for i := range snake {
+		snake[i] = Coord{0, 0}
 	}
-	panic("No such direction")
+	tail := snake[9]
+	visited[tail.Hash()] = struct{}{}
+
+	for _, move := range moves {
+		for i := 0; i < move.amount; i++ {
+			snake[0] = snake[0].Add(*move.direction)
+			for i := 1; i < len(snake); i++ {
+				snake[i] = advanceTail(snake[i-1], snake[i])
+			}
+			visited[snake[9].Hash()] = struct{}{}
+		}
+	}
+
+	return len(visited)
 }
 
 func advanceTail(head, tail Coord) Coord {
@@ -144,27 +165,4 @@ func advanceTail(head, tail Coord) Coord {
 	// . .
 	// . T
 	return tail.Add(difference)
-}
-
-func Part2(moves []Move) int {
-	visited := map[int]struct{}{}
-	snake := [10]Coord{}
-	for i := range snake {
-		snake[i] = Coord{0, 0}
-	}
-	tail := snake[9]
-	visited[tail.Hash()] = struct{}{}
-
-	for _, move := range moves {
-		for i := 0; i < move.amount; i++ {
-			dir := directionToCoord(move.direction)
-			snake[0] = snake[0].Add(*dir)
-			for i := 1; i < len(snake); i++ {
-				snake[i] = advanceTail(snake[i-1], snake[i])
-			}
-			visited[snake[9].Hash()] = struct{}{}
-		}
-	}
-
-	return len(visited)
 }
