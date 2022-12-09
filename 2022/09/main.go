@@ -37,8 +37,8 @@ func (c *Coord) Sub(o Coord) Coord {
 	return Coord{x: newX, y: newY}
 }
 
-func (c *Coord) Euclid() int {
-	return util.IntAbs(c.x*c.x) + util.IntAbs(c.y*c.y)
+func (c *Coord) Chebyshev() int {
+	return util.IntMax(util.IntAbs(c.x), util.IntAbs(c.y))
 }
 
 func (c *Coord) Normalize() {
@@ -149,8 +149,8 @@ func Part2(moves []Move) int {
 
 func advanceTail(head, tail Coord) Coord {
 	difference := head.Sub(tail)
-	mag := difference.Euclid()
-	if mag < 3 {
+	mag := difference.Chebyshev()
+	if mag < 2 {
 		return tail
 	}
 	difference.Normalize()
