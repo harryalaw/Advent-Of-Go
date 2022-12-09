@@ -154,15 +154,5 @@ func advanceTail(head, tail Coord) Coord {
 		return tail
 	}
 	difference.Normalize()
-	// H . T
-	if mag == 4 {
-		return tail.Add(difference)
-	}
-	// H . .
-	// . . T
-	// actually want T to move diagonally -1,1
-	// H .
-	// . .
-	// . T
 	return tail.Add(difference)
 }
