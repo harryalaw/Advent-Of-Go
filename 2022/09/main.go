@@ -90,17 +90,17 @@ func doPart2() {
 }
 
 func Part1(moves []Move) int {
-	visited := map[int]bool{}
+	visited := map[int]struct{}{}
 	head := Coord{0, 0}
 	tail := Coord{0, 0}
-	visited[tail.Hash()] = true
+	visited[tail.Hash()] = struct{}{}
 
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
 			dir := directionToCoord(move.direction)
 			head = head.Add(*dir)
 			tail = advanceTail(head, tail)
-			visited[tail.Hash()] = true
+			visited[tail.Hash()] = struct{}{}
 		}
 	}
 
@@ -147,13 +147,13 @@ func advanceTail(head, tail Coord) Coord {
 }
 
 func Part2(moves []Move) int {
-	visited := map[int]bool{}
+	visited := map[int]struct{}{}
 	snake := [10]Coord{}
 	for i := range snake {
 		snake[i] = Coord{0, 0}
 	}
 	tail := snake[9]
-	visited[tail.Hash()] = true
+	visited[tail.Hash()] = struct{}{}
 
 	for _, move := range moves {
 		for i := 0; i < move.amount; i++ {
@@ -165,7 +165,7 @@ func Part2(moves []Move) int {
 				}
 				snake[i] = advanceTail(snake[i-1], snake[i])
 			}
-			visited[snake[9].Hash()] = true
+			visited[snake[9].Hash()] = struct{}{}
 		}
 	}
 
