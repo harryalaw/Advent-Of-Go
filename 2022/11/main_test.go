@@ -9,7 +9,7 @@ import (
 var testData string
 
 func TestPart1(t *testing.T) {
-	input := parseInput(testData)
+	input, _ := parseInput(testData)
 
 	value := Part1(input)
 	expected := 10605
@@ -20,10 +20,10 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	input := parseInput(testData)
+	input, lcm := parseInput(testData)
 
-	value := Part2(input)
-	expected := -1
+	value := Part2(input, lcm)
+	expected := 2713310158
 
 	if value != expected {
 		t.Errorf("Value wrong, expected=%d, got=%d", expected, value)

@@ -55,18 +55,19 @@ func parseOperation(input string) Operation {
 	}
 }
 
-func parsePredicate(input string) Predicate {
+func parsePredicate(input string) (Predicate, int) {
 	symbols := strings.Fields(input)
 	amount := util.Atoi(symbols[2])
 
 	return func(a int) bool {
 		return a%amount == 0
-	}
+	}, amount
 }
 
-func parseInput(input string) []*Monkey {
+func parseInput(input string) ([]*Monkey, int) {
 	monkeyText := strings.Split(strings.TrimSpace(input), "\n\n")
 	monkeys := make([]*Monkey, len(monkeyText))
+	lcm := 1
 
 	for i, monkey := range monkeyText {
 		lines := strings.Split(strings.TrimSpace(monkey), "\n")
@@ -79,7 +80,9 @@ func parseInput(input string) []*Monkey {
 
 		op := parseOperation(strings.Split(lines[2], ": ")[1])
 
-		test := parsePredicate(strings.Split(lines[3], ": ")[1])
+		test, factor := parsePredicate(strings.Split(lines[3], ": ")[1])
+
+		lcm = util.Lcm(lcm, factor)
 
 		targets := [2]int{}
 		targets[0] = util.Atoi(strings.Fields(lines[4])[5])
@@ -94,7 +97,7 @@ func parseInput(input string) []*Monkey {
 		}
 	}
 
-	return monkeys
+	return monkeys, lcm
 }
 
 func main() {
@@ -103,13 +106,13 @@ func main() {
 }
 
 func doPart1() {
-	data := parseInput(input)
+	data, _ := parseInput(input)
 	fmt.Println("Part 1: ", Part1(data))
 }
 
 func doPart2() {
-	data := parseInput(input)
-	fmt.Println("Part 2: ", Part2(data))
+	data, lcm := parseInput(input)
+	fmt.Println("Part 2: ", Part2(data, lcm))
 }
 
 func Part1(monkeys []*Monkey) int {
@@ -166,7 +169,7 @@ func printMonkeys(monkeys []*Monkey) {
 	}
 }
 
-func Part2(monkeys []*Monkey) int {
+func Part2(monkeys []*Monkey, lcm int) int {
 	// not 20439655544
 	// how to handle overflows?
 	// a bigint package?
@@ -175,6 +178,7 @@ func Part2(monkeys []*Monkey) int {
 			for _, item := range monkey.items {
 				monkey.interactions += 1
 				item = monkey.op(item)
+				item = item % lcm
 				var targetMonkey int
 				if monkey.test(item) {
 					targetMonkey = monkey.targets[0]
