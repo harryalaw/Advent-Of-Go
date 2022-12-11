@@ -116,24 +116,36 @@ func doPart2() {
 }
 
 func Part1(monkeys []*Monkey) int {
-	/*
-		 for 20 rounds
-		 	for each monkey
-				Inspect each item
-					increment count
-				do operation
-				divide by 3
-				throw to next monkey
+	monkeyLoop(
+		monkeys,
+		20,
+		func(a int) int {
+			return a / 3
+		},
+	)
 
-		mult two most active monkeys
-	*/
+	return getMostInteractions(monkeys)
+}
 
-	for i := 0; i < 20; i++ {
+func Part2(monkeys []*Monkey, lcm int) int {
+	monkeyLoop(
+		monkeys,
+		10000,
+		func(a int) int {
+			return a % lcm
+		},
+	)
+
+	return getMostInteractions(monkeys)
+}
+
+func monkeyLoop(monkeys []*Monkey, iters int, reducer func(int) int) {
+	for i := 0; i < iters; i++ {
 		for _, monkey := range monkeys {
 			for _, item := range monkey.items {
 				monkey.interactions += 1
 				item = monkey.op(item)
-				item /= 3
+				item = reducer(item)
 				var targetMonkey int
 				if monkey.test(item) {
 					targetMonkey = monkey.targets[0]
@@ -145,18 +157,6 @@ func Part1(monkeys []*Monkey) int {
 			monkey.items = []int{}
 		}
 	}
-
-	mostInteractions := []int{0, 0}
-	for _, monkey := range monkeys {
-		if monkey.interactions > mostInteractions[0] {
-			mostInteractions[1] = mostInteractions[0]
-			mostInteractions[0] = monkey.interactions
-		} else if monkey.interactions > mostInteractions[1] {
-			mostInteractions[1] = monkey.interactions
-		}
-	}
-
-	return mostInteractions[0] * mostInteractions[1]
 }
 
 func printMonkeys(monkeys []*Monkey) {
@@ -169,28 +169,7 @@ func printMonkeys(monkeys []*Monkey) {
 	}
 }
 
-func Part2(monkeys []*Monkey, lcm int) int {
-	// not 20439655544
-	// how to handle overflows?
-	// a bigint package?
-	for i := 0; i < 10000; i++ {
-		for _, monkey := range monkeys {
-			for _, item := range monkey.items {
-				monkey.interactions += 1
-				item = monkey.op(item)
-				item = item % lcm
-				var targetMonkey int
-				if monkey.test(item) {
-					targetMonkey = monkey.targets[0]
-				} else {
-					targetMonkey = monkey.targets[1]
-				}
-				monkeys[targetMonkey].items = append(monkeys[targetMonkey].items, item)
-			}
-			monkey.items = []int{}
-		}
-	}
-
+func getMostInteractions(monkeys []*Monkey) int {
 	mostInteractions := []int{0, 0}
 	for _, monkey := range monkeys {
 		if monkey.interactions > mostInteractions[0] {
