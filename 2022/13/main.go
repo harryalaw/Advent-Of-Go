@@ -4,7 +4,6 @@ import (
 	"bytes"
 	_ "embed"
 	"fmt"
-	"sort"
 	"strings"
 
 	util "github.com/harryalaw/advent-of-go/util"
@@ -24,10 +23,6 @@ const (
 type Value interface {
 	LessThan(v Value) Result
 	String() string
-}
-
-type Packet struct {
-	data Value
 }
 
 type List []Value
@@ -98,8 +93,8 @@ func (i *Integer) LessThan(v Value) Result {
 }
 
 type Packets struct {
-	left  Packet
-	right Packet
+	left  Value
+	right Value
 }
 
 func isDigit(r byte) bool {
@@ -172,8 +167,8 @@ func parseInput(input string) []Packets {
 		rightData := value(rightText)
 
 		out[i] = Packets{
-			left:  Packet{data: leftData},
-			right: Packet{data: rightData},
+			left:  leftData,
+			right: rightData,
 		}
 	}
 
@@ -198,7 +193,7 @@ func doPart2() {
 func Part1(packets []Packets) int {
 	total := 0
 	for i, packet := range packets {
-		result := packet.left.data.LessThan(packet.right.data)
+		result := packet.left.LessThan(packet.right)
 		if result == Less {
 			total += i + 1
 		}
@@ -207,26 +202,29 @@ func Part1(packets []Packets) int {
 }
 
 func Part2(data []Packets) int {
-	packets := make([]Value, len(data)*2)
-	for i, value := range data {
-		packets[2*i] = value.left.data
-		packets[2*i+1] = value.right.data
-	}
 
 	divider2 := value("[[2]]")
 	divider6 := value("[[6]]")
 
-	packets = append(packets, divider2, divider6)
+	// indexes are offset by one
+	lessThan2 := 1
+	// divider2 is less than divider6 so starts one higher
+	lessThan6 := 2
+	for _, pair := range data {
+		if pair.left.LessThan(divider2) == Less {
+			lessThan2 += 1
+		}
+		if pair.right.LessThan(divider2) == Less {
+			lessThan2 += 1
+		}
 
-	sort.Slice(packets, func(i, j int) bool {
-		return packets[i].LessThan(packets[j]) == Less
-	})
-
-	total := 1
-	for i := 0; i < len(packets); i++ {
-		if packets[i].String() == divider2.String() || packets[i].String() == divider6.String() {
-			total *= (i + 1)
+		if pair.left.LessThan(divider6) == Less {
+			lessThan6 += 1
+		}
+		if pair.right.LessThan(divider6) == Less {
+			lessThan6 += 1
 		}
 	}
-	return total
+
+	return lessThan2 * lessThan6
 }
