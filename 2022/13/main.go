@@ -30,16 +30,14 @@ type Packet struct {
 	data Value
 }
 
-type List struct {
-	items []Value
-}
+type List []Value
 
 func (l *List) String() string {
 	var out bytes.Buffer
 	out.WriteRune('[')
-	for i, item := range l.items {
+	for i, item := range *l {
 		out.WriteString(item.String())
-		if i != len(l.items)-1 {
+		if i != len(*l)-1 {
 			out.WriteRune(',')
 		}
 	}
@@ -51,16 +49,16 @@ func (l *List) String() string {
 func (l *List) LessThan(v Value) Result {
 	switch v := v.(type) {
 	case *List:
-		minLength := util.IntMin(len(l.items), len(v.items))
+		minLength := util.IntMin(len(*l), len(*v))
 		for i := 0; i < minLength; i++ {
-			res := l.items[i].LessThan(v.items[i])
+			res := (*l)[i].LessThan((*v)[i])
 			if res == Less || res == Greater {
 				return res
 			}
 		}
-		if len(l.items) < len(v.items) {
+		if len(*l) < len(*v) {
 			return Less
-		} else if len(l.items) > len(v.items) {
+		} else if len(*l) > len(*v) {
 			return Greater
 		}
 		return Equal
@@ -79,10 +77,7 @@ func (i *Integer) String() string {
 }
 
 func (i *Integer) ToList() List {
-	newList := make([]Value, 0)
-	newList = append(newList, i)
-
-	return List{items: newList}
+	return []Value{i}
 }
 
 func (i *Integer) LessThan(v Value) Result {
@@ -138,14 +133,14 @@ func parseList(text string, list *List) int {
 		case ']':
 			return i + 1
 		case '[':
-			newList := List{items: []Value{}}
+			newList := List{}
 			offset := parseList(text[i+1:], &newList)
-			list.items = append(list.items, &newList)
+			*list = append(*list, &newList)
 			i += offset
 		default:
 			number, offset := parseInt(text[i:])
 			i += offset - 1
-			list.items = append(list.items, &number)
+			*list = append(*list, &number)
 		}
 	}
 	return len(text)
@@ -154,7 +149,7 @@ func parseList(text string, list *List) int {
 func value(text string) Value {
 	c := text[0]
 	if c == '[' {
-		newList := List{items: []Value{}}
+		newList := List{}
 		parseList(text[1:], &newList)
 		return &newList
 	} else {
