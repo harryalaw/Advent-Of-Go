@@ -72,16 +72,10 @@ func (l *List) LessThan(v Value) Result {
 	}
 }
 
-type Integer struct {
-	val int
-}
+type Integer int
 
 func (i *Integer) String() string {
-	return fmt.Sprintf("%d", i.val)
-}
-
-func (i *Integer) GetVal() int {
-	return i.val
+	return fmt.Sprintf("%d", i)
 }
 
 func (i *Integer) ToList() List {
@@ -97,9 +91,9 @@ func (i *Integer) LessThan(v Value) Result {
 		newList := i.ToList()
 		return newList.LessThan(v)
 	case *Integer:
-		if i.val == v.val {
+		if *i == *v {
 			return Equal
-		} else if i.val < v.val {
+		} else if *i < *v {
 			return Less
 		}
 		return Greater
@@ -130,7 +124,7 @@ func parseInt(text string) (Integer, int) {
 	for isDigit(text[i]) {
 		i++
 	}
-	number := Integer{val: util.Atoi(text[0:i])}
+	number := Integer(util.Atoi(text[0:i]))
 
 	return number, i
 }
