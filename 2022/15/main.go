@@ -38,9 +38,9 @@ func (c *Circle) contains(coord *Coord) bool {
 	return c.center.Manhattan(coord) <= c.radius
 }
 
+// returns an array of coords starting from the top and working clockwise
+// provided the x,y coords are in the range min,max
 func (c *Circle) traceEdge(min, max int) []Coord {
-	// returns an array of coords starting from the top and working clockwise
-	// provided the x,y coords are in the range min,max
 	out := make([]Coord, 0)
 	expandedR := c.radius + 1
 	maxSteps := 4 * expandedR
@@ -177,21 +177,125 @@ func Part1(sensors []Sensor, targetRow int) int {
 	return totalOccupied
 }
 
+// Line of the form y = mx + c
+// if we know y0 and y1 we can compute x0,x1 if needed
+// probably use x0,x1
+// where m is ±1
+type Line struct {
+	x0 int
+	x1 int
+	m  int
+	c  int
+}
+
+// l = ax + c
+// o = bx + d
+// a == 1 as l is posLine
+// b == -1 as o is a negLine
+func (l *Line) intersect(o *Line) *Coord {
+	x := (o.c - l.c)
+	if x%2 != 0 {
+		return nil
+	}
+	x /= 2
+	if l.x0 <= x && x <= l.x1 && o.x0 <= x && x <= o.x1 {
+		return &Coord{x: x, y: x + l.c}
+	}
+	return nil
+}
+
+// there are four lines that bound the circle
+// (x-r, y) -> (x, y+r)
+// (x-r, y) -> (x, y-r)
+// (x, y+r) -> (x+r, y)
+// (x, y-r) -> (x+r, y)
+// these all have slope ±1
+// and c is given by initial x,y values as c = y0 - mx0 <=> c= y0 ± x0
+func (c *Circle) getLines() (Line, Line, Line, Line) {
+	x := c.center.x
+	y := c.center.y
+	r := c.radius
+
+	// (x-r, y) -> (x, y+r)
+	l1 := Line{x0: x - r, x1: x, m: 1, c: y - x + r}
+	// (x, y-r) -> (x+r, y)
+	l2 := Line{x0: x, x1: x + 1, m: 1, c: y - x - r}
+	// (x, y+r) -> (x+r, y)
+	l3 := Line{x0: x, x1: x + r, m: -1, c: y + x - r}
+	// (x, y-r) -> (x+r, y)
+	l4 := Line{x0: x, x1: x + r, m: -1, c: y + x + r}
+
+	return l1, l2, l3, l4
+}
+
 func Part2(sensors []Sensor, max int) int {
 	circles := make([]*Circle, len(sensors))
+	// how can we exploit our knowledge for what I'm solving
+	// there is only one item that is not in a circle
+	// so it must be bounded on two sides by a line
+	// there must be two such lines that have this property
+	// then we can compute the intersection of the two lines
+	// Instead of getting all the edges we could instead take a circle and break it down into 4 lines
+	// then its enough to find all pairs of lines which have a 1 unit gap between them
+	// then there's probably only one good item?
+
+	positiveGradientLines := map[int][]Line{}
+	negativeGradientLines := map[int][]Line{}
 
 	for i, sensor := range sensors {
 		circles[i] = &Circle{center: sensor.position, radius: sensor.position.Manhattan(&sensor.closestBeacon)}
+		l1, l2, l3, l4 := circles[i].getLines()
+
+		positiveGradientLines[l1.c] = append(positiveGradientLines[l1.c], l1)
+		positiveGradientLines[l2.c] = append(positiveGradientLines[l2.c], l2)
+
+		negativeGradientLines[l3.c] = append(negativeGradientLines[l3.c], l3)
+		negativeGradientLines[l4.c] = append(negativeGradientLines[l4.c], l4)
 	}
 
-	for _, circle := range circles {
-		edge := circle.traceEdge(0, max)
-		for _, pos := range edge {
-			if isContained(&pos, &circles) {
-				continue
-			}
-			return pos.x*4000000 + pos.y
+	// for each positive line we need to check if there is a line with offset ±2
+	possiblePosLines := make([]Line, 0)
+
+	for offset := range positiveGradientLines {
+		_, ok := positiveGradientLines[offset+2]
+		if !ok {
+			continue
 		}
+		possiblePosLines = append(possiblePosLines, Line{
+			x0: 0,
+			x1: max,
+			m:  1,
+			c:  offset + 1,
+		})
+	}
+
+	possibleNegLines := make([]Line, 0)
+
+	for offset := range negativeGradientLines {
+		possibleNegLines = append(possibleNegLines, Line{
+			x0: 0,
+			x1: max,
+			m:  -1,
+			c:  offset + 1,
+		})
+	}
+
+	intersectionPoints := make([]*Coord, 0)
+
+	for _, posLine := range possiblePosLines {
+		for _, negLine := range possibleNegLines {
+			intersectionPoint := posLine.intersect(&negLine)
+			if intersectionPoint != nil {
+				intersectionPoints = append(intersectionPoints, intersectionPoint)
+			}
+		}
+	}
+
+	for _, point := range intersectionPoints {
+		if isContained(point, &circles) {
+			continue
+		}
+		return point.x*4000000 + point.y
 	}
 
 	return -1
