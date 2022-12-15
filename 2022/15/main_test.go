@@ -22,7 +22,7 @@ func TestPart1(t *testing.T) {
 func TestPart2(t *testing.T) {
 	input := parseInput(testData)
 
-	value := Part2(input)
+	value := Part2(input, 20)
 	expected := 56000011
 
 	if expected != value {
