@@ -178,10 +178,10 @@ func Part1(sensors []Sensor, targetRow int) int {
 }
 
 func Part2(sensors []Sensor, max int) int {
-	circles := make([]Circle, len(sensors))
+	circles := make([]*Circle, len(sensors))
 
 	for i, sensor := range sensors {
-		circles[i] = Circle{center: sensor.position, radius: sensor.position.Manhattan(&sensor.closestBeacon)}
+		circles[i] = &Circle{center: sensor.position, radius: sensor.position.Manhattan(&sensor.closestBeacon)}
 	}
 
 	for _, circle := range circles {
@@ -197,7 +197,7 @@ func Part2(sensors []Sensor, max int) int {
 	return -1
 }
 
-func isContained(pos *Coord, circles *[]Circle) bool {
+func isContained(pos *Coord, circles *[]*Circle) bool {
 	for _, circle := range *circles {
 		if circle.contains(pos) {
 			return true
