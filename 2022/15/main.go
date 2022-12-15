@@ -130,9 +130,6 @@ func (i *Interval) intersection(o *Interval) *Interval {
 }
 
 func Part1(sensors []Sensor, targetRow int) int {
-	// should update this to store line intervals instead
-	// then we can just combine and split intervals
-	// or just indicate +- and reduce at the end
 	occupiedInTargetRow := make([]Interval, 0)
 	beaconsInRow := map[int]bool{}
 	for _, sensor := range sensors {
@@ -178,27 +175,26 @@ func Part1(sensors []Sensor, targetRow int) int {
 }
 
 // Line of the form y = mx + c
-// if we know y0 and y1 we can compute x0,x1 if needed
-// probably use x0,x1
 // where m is ±1
 type Line struct {
-	x0 int
-	x1 int
-	m  int
-	c  int
+	m int
+	c int
 }
 
 // l = ax + c
 // o = bx + d
 // a == 1 as l is posLine
 // b == -1 as o is a negLine
-func (l *Line) intersect(o *Line) *Coord {
+// intersection x value given by:  ax+c = bx + d
+// then y = ax + c = x + c
+func (l *Line) intersect(o *Line, max int) *Coord {
 	x := (o.c - l.c)
 	if x%2 != 0 {
 		return nil
 	}
 	x /= 2
-	if l.x0 <= x && x <= l.x1 && o.x0 <= x && x <= o.x1 {
+	y := x + l.c
+	if 0 <= x && x <= max && 0 <= y && y <= max {
 		return &Coord{x: x, y: x + l.c}
 	}
 	return nil
@@ -217,30 +213,38 @@ func (c *Circle) getLines() (Line, Line, Line, Line) {
 	r := c.radius
 
 	// (x-r, y) -> (x, y+r)
-	l1 := Line{x0: x - r, x1: x, m: 1, c: y - x + r}
+	l1 := Line{m: 1, c: y - x + r}
 	// (x, y-r) -> (x+r, y)
-	l2 := Line{x0: x, x1: x + 1, m: 1, c: y - x - r}
+	l2 := Line{m: 1, c: y - x - r}
 	// (x, y+r) -> (x+r, y)
-	l3 := Line{x0: x, x1: x + r, m: -1, c: y + x - r}
+	l3 := Line{m: -1, c: y + x - r}
 	// (x, y-r) -> (x+r, y)
-	l4 := Line{x0: x, x1: x + r, m: -1, c: y + x + r}
+	l4 := Line{m: -1, c: y + x + r}
 
 	return l1, l2, l3, l4
 }
 
+func (c *Coord) Hash() int {
+	return c.x*1000000 + c.y
+}
+
 func Part2(sensors []Sensor, max int) int {
-	circles := make([]*Circle, len(sensors))
-	// how can we exploit our knowledge for what I'm solving
-	// there is only one item that is not in a circle
-	// so it must be bounded on two sides by a line
-	// there must be two such lines that have this property
-	// then we can compute the intersection of the two lines
-	// Instead of getting all the edges we could instead take a circle and break it down into 4 lines
-	// then its enough to find all pairs of lines which have a 1 unit gap between them
-	// then there's probably only one good item?
+	/*
+		Since there is only one point it must be bounded on all sides by edges of circles
+		If we compute the lines that bound each circle we can find all pairs of lines
+		with a gap of 1 between them to identify the possible lines that the distress beacon
+		could lie on.
+
+		We can then identify positions by intersecting lines with gradient +1 with lines with gradient -1
+		to find possible positions for the distress beacon.
+
+		Then just check if any of these possibilities are contained in any circle
+	*/
 
 	positiveGradientLines := map[int][]Line{}
 	negativeGradientLines := map[int][]Line{}
+
+	circles := make([]*Circle, len(sensors))
 
 	for i, sensor := range sensors {
 		circles[i] = &Circle{center: sensor.position, radius: sensor.position.Manhattan(&sensor.closestBeacon)}
@@ -253,52 +257,46 @@ func Part2(sensors []Sensor, max int) int {
 		negativeGradientLines[l4.c] = append(negativeGradientLines[l4.c], l4)
 	}
 
-	// for each positive line we need to check if there is a line with offset ±2
-	possiblePosLines := make([]Line, 0)
+	posLines := computeLineGaps(positiveGradientLines, 1)
+	negLines := computeLineGaps(negativeGradientLines, -1)
 
-	for offset := range positiveGradientLines {
-		_, ok := positiveGradientLines[offset+2]
-		if !ok {
-			continue
-		}
-		possiblePosLines = append(possiblePosLines, Line{
-			x0: 0,
-			x1: max,
-			m:  1,
-			c:  offset + 1,
-		})
-	}
+	intersectionPoints := map[int]Coord{}
 
-	possibleNegLines := make([]Line, 0)
+	for _, posLine := range posLines {
+		for _, negLine := range negLines {
+			intersectionPoint := posLine.intersect(&negLine, max)
 
-	for offset := range negativeGradientLines {
-		possibleNegLines = append(possibleNegLines, Line{
-			x0: 0,
-			x1: max,
-			m:  -1,
-			c:  offset + 1,
-		})
-	}
-
-	intersectionPoints := make([]*Coord, 0)
-
-	for _, posLine := range possiblePosLines {
-		for _, negLine := range possibleNegLines {
-			intersectionPoint := posLine.intersect(&negLine)
 			if intersectionPoint != nil {
-				intersectionPoints = append(intersectionPoints, intersectionPoint)
+				intersectionPoints[intersectionPoint.Hash()] = *intersectionPoint
 			}
 		}
 	}
 
 	for _, point := range intersectionPoints {
-		if isContained(point, &circles) {
+		if isContained(&point, &circles) {
 			continue
 		}
 		return point.x*4000000 + point.y
 	}
 
 	return -1
+}
+
+func computeLineGaps(lines map[int][]Line, gradient int) []Line {
+	out := make([]Line, 0)
+
+	for offset := range lines {
+		_, ok := lines[offset+2]
+		if !ok {
+			continue
+		}
+		out = append(out, Line{
+			m: gradient,
+			c: offset + 1,
+		})
+	}
+
+	return out
 }
 
 func isContained(pos *Coord, circles *[]*Circle) bool {
