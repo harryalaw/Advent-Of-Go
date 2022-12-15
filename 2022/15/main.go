@@ -100,18 +100,43 @@ func doPart2() {
 	fmt.Println("Part 2: ", Part2(data, 4000000))
 }
 
+type Interval struct {
+	start    int
+	end      int
+	negative bool
+}
+
+func (i *Interval) intersection(o *Interval) *Interval {
+	a, b := i.start, i.end
+	c, d := o.start, o.end
+
+	// make a <= c
+	if c < a {
+		tempA := a
+		a = c
+		c = tempA
+		tempB := b
+		b = d
+		d = tempB
+	}
+
+	if b < c {
+		return nil
+	} else if b < d {
+		return &Interval{start: c, end: b, negative: !o.negative}
+	} else {
+		return &Interval{start: c, end: d, negative: !o.negative}
+	}
+}
+
 func Part1(sensors []Sensor, targetRow int) int {
 	// should update this to store line intervals instead
 	// then we can just combine and split intervals
 	// or just indicate +- and reduce at the end
-	occupiedInTargetRow := map[int]bool{}
+	occupiedInTargetRow := make([]Interval, 0)
 	beaconsInRow := map[int]bool{}
 	for _, sensor := range sensors {
-		if sensor.position.y == targetRow {
-			occupiedInTargetRow[sensor.position.x] = true
-		}
 		if sensor.closestBeacon.y == targetRow {
-			occupiedInTargetRow[sensor.closestBeacon.x] = true
 			beaconsInRow[sensor.closestBeacon.x] = true
 		}
 
@@ -125,15 +150,31 @@ func Part1(sensors []Sensor, targetRow int) int {
 
 		xFlex := radius - gap
 
-		// this should be rethought with intervals instead
-		// we can add intervals to a list with intersections and a sign
-		// then use inclusion/exclusion to count them better
-		for i := -xFlex; i <= xFlex; i++ {
-			occupiedInTargetRow[sensor.position.x+i] = true
+		newInterval := Interval{start: sensor.position.x - xFlex, end: sensor.position.x + xFlex, negative: false}
+
+		toAdd := make([]Interval, 1)
+		toAdd[0] = newInterval
+
+		for _, interval := range occupiedInTargetRow {
+			intersection := newInterval.intersection(&interval)
+			if intersection != nil {
+				toAdd = append(toAdd, *intersection)
+			}
 		}
+		occupiedInTargetRow = append(occupiedInTargetRow, toAdd...)
 	}
 
-	return len(occupiedInTargetRow) - len(beaconsInRow)
+	totalOccupied := 0
+	for _, interval := range occupiedInTargetRow {
+		distance := interval.end - interval.start + 1
+		if interval.negative {
+			distance = -distance
+		}
+		totalOccupied += distance
+	}
+	totalOccupied -= len(beaconsInRow)
+
+	return totalOccupied
 }
 
 func Part2(sensors []Sensor, max int) int {
