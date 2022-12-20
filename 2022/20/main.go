@@ -53,15 +53,38 @@ func doPart2() {
 	fmt.Println("Part 2: ", Part2(nodes))
 }
 
-func move(node *CircleNode) *CircleNode {
+func Part1(nodes []*CircleNode) int {
+	mix(&nodes)
 
+	return findCoords(nodes)
+}
+
+func Part2(nodes []*CircleNode) int {
+	for _, node := range nodes {
+		node.value *= 811589153
+	}
+	for i := 0; i < 10; i++ {
+		mix(&nodes)
+	}
+
+	return findCoords(nodes)
+}
+
+func mix(nodes *[]*CircleNode) {
+	l := len(*nodes)
+	for _, node := range *nodes {
+		move(node, (node.value % (l - 1)))
+	}
+}
+
+func move(node *CircleNode, value int) *CircleNode {
 	temp := node.prev
 	node.prev.next = node.next
 	node.next.prev = node.prev
 
-	distance := util.IntAbs(node.value)
+	distance := util.IntAbs(value)
 	for i := 0; i < distance; i++ {
-		if node.value > 0 {
+		if value > 0 {
 			temp = temp.next
 		} else {
 			temp = temp.prev
@@ -76,14 +99,12 @@ func move(node *CircleNode) *CircleNode {
 	return node
 }
 
-func Part1(nodes []*CircleNode) int {
-
+func findCoords(nodes []*CircleNode) int {
 	zeroIdx := -1
 	for i, node := range nodes {
 		if node.value == 0 {
 			zeroIdx = i
 		}
-		move(node)
 	}
 
 	total := 0
@@ -94,10 +115,5 @@ func Part1(nodes []*CircleNode) int {
 			total += currentNode.value
 		}
 	}
-
 	return total
-}
-
-func Part2(nodes []*CircleNode) int {
-	return -1
 }
