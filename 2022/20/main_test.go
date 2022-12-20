@@ -9,9 +9,9 @@ import (
 var testData string
 
 func TestPart1(t *testing.T) {
-	start, end, numbers := parseInput(testData)
+	nodes := parseInput(testData)
 
-	value := Part1(start, end, numbers)
+	value := Part1(nodes)
 	expected := 3
 
 	if value != expected {
@@ -20,12 +20,12 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	// input, _, _ := parseInput(testData)
-	//
-	// value := Part2(*input)
-	// expected := 3
-	//
-	// if value != expected {
-	// 	t.Errorf("Value not correct, expected=%d, got=%d", expected, value)
-	// }
+	input := parseInput(testData)
+
+	value := Part2(input)
+	expected := 1623178306
+
+	if value != expected {
+		t.Errorf("Value not correct, expected=%d, got=%d", expected, value)
+	}
 }
