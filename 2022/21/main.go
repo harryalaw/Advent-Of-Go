@@ -197,8 +197,7 @@ func Part2(monkeys Monkeys) int {
 	// or we do a binary search to find humn value
 	// have low = 0, high = 1_000_000_000_000
 	low := 0
-	high := 1_000_000_000_000_000
-
+	high := 10_000_000_000_000
 	goodGuess := -1
 	for {
 		mid := (low + high) / 2
