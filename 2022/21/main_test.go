@@ -20,12 +20,12 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	// input := parseInput(testData)
-	//
-	// value := Part2(input)
-	// expected := 152
-	//
-	// if value != expected {
-	// 	t.Errorf("Value not correct, expected=%d, got=%d", expected, value)
-	// }
+	input := parseInput(testData)
+
+	value := Part2(input)
+	expected := 301
+
+	if value != expected {
+		t.Errorf("Value not correct, expected=%d, got=%d", expected, value)
+	}
 }

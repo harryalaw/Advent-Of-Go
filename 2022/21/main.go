@@ -46,6 +46,12 @@ func mult(left, right int) int {
 func div(left, right int) int {
 	return left / right
 }
+func eq(left, right int) int {
+	if left == right {
+		return 1
+	}
+	return 0
+}
 
 func parseOp(operation string) func(int, int) int {
 	switch operation {
@@ -128,6 +134,101 @@ func Part1(monkeys Monkeys) int {
 	return values["root"]
 }
 
+func part1Alg(monkeys Monkeys) map[string]int {
+	values := map[string]int{}
+	for len(values) != len(monkeys) {
+		for name, monkey := range monkeys {
+			if _, ok := values[name]; ok {
+				continue
+			}
+
+			switch monkey := monkey.(type) {
+			case NumberMonkey:
+				values[name] = monkey.value
+			case MathMonkey:
+				leftVal, ok := values[monkey.left]
+				if !ok {
+					continue
+				}
+				rightVal, ok := values[monkey.right]
+				if !ok {
+					continue
+				}
+				values[name] = monkey.operation(leftVal, rightVal)
+			}
+		}
+	}
+	return values
+}
+
 func Part2(monkeys Monkeys) int {
-	return -1
+	rootMonkey := monkeys["root"]
+	newRoot := rootMonkey.(MathMonkey)
+	newRoot.operation = eq
+	monkeys["root"] = newRoot
+
+	leftMonkey := newRoot.left
+	rightMonkey := newRoot.right
+
+	var humnSide string
+	monkeys["humn"] = NumberMonkey{value: 0}
+	values := part1Alg(monkeys)
+	leftVal1 := values[leftMonkey]
+	rightVal1 := values[rightMonkey]
+
+	monkeys["humn"] = NumberMonkey{value: 1000000000}
+	values = part1Alg(monkeys)
+	leftVal2 := values[leftMonkey]
+
+	var target int
+	if leftVal1 == leftVal2 {
+		humnSide = rightMonkey
+		target = leftVal1
+
+	} else {
+		humnSide = leftMonkey
+		target = rightVal1
+	}
+
+	// or we do a binary search to find humn value
+	// have low = 0, high = 1_000_000_000_000
+	low := 0
+	high := 1_000_000_000_000_000
+
+	goodGuess := -1
+	for {
+		mid := (low + high) / 2
+		fmt.Println(mid)
+		monkeys["humn"] = NumberMonkey{value: mid}
+		values := part1Alg(monkeys)
+		if values["root"] == 1 {
+			goodGuess = mid
+			break
+		}
+		// rootMonkey := monkeys["root"].(MathMonkey)
+		newResult := values[humnSide]
+		if target > newResult {
+			high = mid - 1
+		} else {
+			low = mid + 1
+		}
+	}
+	lastGoodGuess := goodGuess
+	for {
+		goodGuess--
+		monkeys["humn"] = NumberMonkey{value: goodGuess}
+		values := part1Alg(monkeys)
+		if values["root"] == 1 {
+			lastGoodGuess = goodGuess
+			continue
+		}
+		break
+	}
+
+	/*
+		Create a big old equation
+		then solve it
+	*/
+
+	return lastGoodGuess
 }
