@@ -179,15 +179,19 @@ func Part2(monkeys Monkeys) int {
 	monkeys["humn"] = NumberMonkey{value: 1000000000}
 	values = part1Alg(monkeys)
 	leftVal2 := values[leftMonkey]
+	rightVal2 := values[rightMonkey]
 
 	var target int
+	var isDecreasing bool
 	if leftVal1 == leftVal2 {
 		humnSide = rightMonkey
 		target = leftVal1
+		isDecreasing = rightVal1 > rightVal2
 
 	} else {
 		humnSide = leftMonkey
 		target = rightVal1
+		isDecreasing = leftVal1 > leftVal2
 	}
 
 	// or we do a binary search to find humn value
@@ -198,21 +202,29 @@ func Part2(monkeys Monkeys) int {
 	goodGuess := -1
 	for {
 		mid := (low + high) / 2
-		fmt.Println(mid)
 		monkeys["humn"] = NumberMonkey{value: mid}
 		values := part1Alg(monkeys)
 		if values["root"] == 1 {
 			goodGuess = mid
 			break
 		}
-		// rootMonkey := monkeys["root"].(MathMonkey)
+
 		newResult := values[humnSide]
-		if target > newResult {
-			high = mid - 1
+		if isDecreasing {
+			if target > newResult {
+				high = mid - 1
+			} else {
+				low = mid + 1
+			}
 		} else {
-			low = mid + 1
+			if target < newResult {
+				high = mid - 1
+			} else {
+				low = mid + 1
+			}
 		}
 	}
+
 	lastGoodGuess := goodGuess
 	for {
 		goodGuess--
@@ -224,11 +236,6 @@ func Part2(monkeys Monkeys) int {
 		}
 		break
 	}
-
-	/*
-		Create a big old equation
-		then solve it
-	*/
 
 	return lastGoodGuess
 }
