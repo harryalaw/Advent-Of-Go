@@ -27,6 +27,10 @@ func (c *Coord) equals(o *Coord) bool {
 	return c.x == o.x && c.y == o.y
 }
 
+func (c *Coord) hash() int {
+	return c.x*100_000 + c.y
+}
+
 type ElfPosition map[int]Coord
 
 func parseInput(input string) ElfPosition {
@@ -162,12 +166,9 @@ func getDirections(round int) [][]*Coord {
 type ProposedPosition map[int](map[int][]int)
 
 func proposePositions(elves ElfPosition, round int) ProposedPosition {
-	occupiedSpaces := map[int](map[int]bool){}
+	occupiedSpaces := map[int]bool{}
 	for _, coord := range elves {
-		if _, ok := occupiedSpaces[coord.x]; !ok {
-			occupiedSpaces[coord.x] = map[int]bool{}
-		}
-		occupiedSpaces[coord.x][coord.y] = true
+		occupiedSpaces[coord.hash()] = true
 	}
 	directions := getDirections(round)
 
@@ -182,7 +183,7 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 				newPos2 := coord.add(direction[1])
 				newPos3 := coord.add(direction[2])
 				emptySpace := true
-				if occupiedSpaces[newPos1.x][newPos1.y] || occupiedSpaces[newPos2.x][newPos2.y] || occupiedSpaces[newPos3.x][newPos3.y] {
+				if occupiedSpaces[newPos1.hash()] || occupiedSpaces[newPos2.hash()] || occupiedSpaces[newPos3.hash()] {
 					emptySpace = false
 				}
 				if !emptySpace {
@@ -205,16 +206,14 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 	return proposedPositions
 }
 
-func getNeighbours(coord Coord, occupiedSpaces *map[int](map[int]bool)) bool {
+func getNeighbours(coord Coord, occupiedSpaces *map[int]bool) bool {
 	for i := -1; i <= 1; i++ {
 		for j := -1; j <= 1; j++ {
 			if i == 0 && j == 0 {
 				continue
 			}
-			if _, xExists := (*occupiedSpaces)[coord.x+i]; !xExists {
-				continue
-			}
-			if _, yExists := (*occupiedSpaces)[coord.x+i][coord.y+j]; yExists {
+			newCoord := Coord{coord.x + i, coord.y + j}
+			if _, ok := (*occupiedSpaces)[newCoord.hash()]; ok {
 				return true
 			}
 		}
