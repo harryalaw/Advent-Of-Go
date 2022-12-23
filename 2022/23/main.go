@@ -162,8 +162,7 @@ func getDirections(round int) [][]*Coord {
 	}
 }
 
-// map x,y to a an elf index
-type ProposedPosition map[int](map[int][]int)
+type ProposedPosition map[Coord][]int
 
 func proposePositions(elves ElfPosition, round int) ProposedPosition {
 	occupiedSpaces := map[int]bool{}
@@ -190,15 +189,12 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 					continue
 				}
 
-				if _, exists := proposedPositions[newPos1.x]; !exists {
-					proposedPositions[newPos1.x] = map[int][]int{}
-				}
-				prev, exists := proposedPositions[newPos1.x][newPos1.y]
+				prev, exists := proposedPositions[newPos1]
 				if !exists {
 					prev = make([]int, 0)
 				}
 				prev = append(prev, elfIdx)
-				proposedPositions[newPos1.x][newPos1.y] = prev
+				proposedPositions[newPos1] = prev
 				break
 			}
 		}
@@ -223,12 +219,10 @@ func getNeighbours(coord Coord, occupiedSpaces *map[int]bool) bool {
 
 func moveElves(elves ElfPosition, moves ProposedPosition) (ElfPosition, int) {
 	moveCounts := 0
-	for x, yMap := range moves {
-		for y, movingElves := range yMap {
-			if len(movingElves) == 1 {
-				elves[movingElves[0]] = Coord{x, y}
-				moveCounts++
-			}
+	for coord, movingElves := range moves {
+		if len(movingElves) == 1 {
+			elves[movingElves[0]] = coord
+			moveCounts++
 		}
 	}
 
