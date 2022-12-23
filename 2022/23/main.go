@@ -170,30 +170,30 @@ func getDirections(round int) [][]Coord {
 type ProposedPosition map[int](map[int][]int)
 
 func proposePositions(elves ElfPosition, round int) ProposedPosition {
-	occupiedSpaces := []Coord{}
+	occupiedSpaces := map[int](map[int]bool){}
 	for _, coord := range elves {
-		occupiedSpaces = append(occupiedSpaces, coord)
+		if _, ok := occupiedSpaces[coord.x]; !ok {
+			occupiedSpaces[coord.x] = map[int]bool{}
+		}
+		occupiedSpaces[coord.x][coord.y] = true
 	}
 	directions := getDirections(round)
 
 	proposedPositions := ProposedPosition{}
 
-	// need to check if no elves are nearby!
-
-	// if elf is nearby check the directions
-
 	for elfIdx, coord := range elves {
-
 		hasNeighbours := false
+		// this is slow!
 		for i := -1; i <= 1; i++ {
 			for j := -1; j <= 1; j++ {
 				if i == 0 && j == 0 {
 					continue
 				}
-				for _, pos := range occupiedSpaces {
-					if pos.equals(&Coord{coord.x + i, coord.y + j}) {
-						hasNeighbours = true
-					}
+				if _, xExists := occupiedSpaces[coord.x+i]; !xExists {
+					continue
+				}
+				if _, yExists := occupiedSpaces[coord.x+i][coord.y+j]; yExists {
+					hasNeighbours = true
 				}
 			}
 		}
@@ -204,10 +204,8 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 				newPos2 := coord.add(&direction[1])
 				newPos3 := coord.add(&direction[2])
 				emptySpace := true
-				for _, pos := range occupiedSpaces {
-					if pos.equals(&newPos1) || pos.equals(&newPos2) || pos.equals(&newPos3) {
-						emptySpace = false
-					}
+				if occupiedSpaces[newPos1.x][newPos1.y] || occupiedSpaces[newPos2.x][newPos2.y] || occupiedSpaces[newPos3.x][newPos3.y] {
+					emptySpace = false
 				}
 				if !emptySpace {
 					continue
@@ -230,7 +228,6 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 }
 
 func moveElves(elves ElfPosition, moves ProposedPosition) (ElfPosition, int) {
-	// proposedPositions wants to map positions to lists of elves
 	moveCounts := 0
 	for x, yMap := range moves {
 		for y, movingElves := range yMap {
