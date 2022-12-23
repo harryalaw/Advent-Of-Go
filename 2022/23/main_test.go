@@ -20,9 +20,12 @@ func TestPart1(t *testing.T) {
 }
 
 func TestPart2(t *testing.T) {
-	// input := parseInput(testData)
+	input := parseInput(testData)
 
-	// value := Part2(input)
+	value := Part2(input)
+	expected := 20
 
-	// t.Errorf("Not asserting on result of Part 1")
+	if value != expected {
+		t.Errorf("Value not correct, expected=%d, got=%d", expected, value)
+	}
 }

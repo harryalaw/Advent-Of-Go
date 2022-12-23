@@ -86,10 +86,9 @@ func (ep *ElfPosition) print() {
 
 func Part1(elves ElfPosition) int {
 	for i := 0; i < 10; i++ {
-		elves.print()
+		// elves.print()
 		proposedPositions := proposePositions(elves, i)
-		elves = moveElves(elves, proposedPositions)
-
+		elves, _ = moveElves(elves, proposedPositions)
 	}
 
 	minX := elves[0].x
@@ -184,62 +183,75 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 	// if elf is nearby check the directions
 
 	for elfIdx, coord := range elves {
-		updated := false
-		for _, direction := range directions {
-			newPos1 := coord.add(&direction[0])
-			newPos2 := coord.add(&direction[1])
-			newPos3 := coord.add(&direction[2])
-			emptySpace := true
-			for _, pos := range occupiedSpaces {
-				if pos.equals(&newPos1) || pos.equals(&newPos2) || pos.equals(&newPos3) {
-					emptySpace = false
+
+		hasNeighbours := false
+		for i := -1; i <= 1; i++ {
+			for j := -1; j <= 1; j++ {
+				if i == 0 && j == 0 {
+					continue
+				}
+				for _, pos := range occupiedSpaces {
+					if pos.equals(&Coord{coord.x + i, coord.y + j}) {
+						hasNeighbours = true
+					}
 				}
 			}
-			if !emptySpace {
-				continue
-			}
-
-			if _, exists := proposedPositions[newPos1.x]; !exists {
-				proposedPositions[newPos1.x] = map[int][]int{}
-			}
-			prev, exists := proposedPositions[newPos1.x][newPos1.y]
-			if !exists {
-				prev = make([]int, 0)
-			}
-			prev = append(prev, elfIdx)
-			proposedPositions[newPos1.x][newPos1.y] = prev
-			updated = true
-			break
 		}
-		if !updated {
-			if _, exists := proposedPositions[coord.x]; !exists {
-				proposedPositions[coord.x] = map[int][]int{}
+
+		if hasNeighbours {
+			for _, direction := range directions {
+				newPos1 := coord.add(&direction[0])
+				newPos2 := coord.add(&direction[1])
+				newPos3 := coord.add(&direction[2])
+				emptySpace := true
+				for _, pos := range occupiedSpaces {
+					if pos.equals(&newPos1) || pos.equals(&newPos2) || pos.equals(&newPos3) {
+						emptySpace = false
+					}
+				}
+				if !emptySpace {
+					continue
+				}
+
+				if _, exists := proposedPositions[newPos1.x]; !exists {
+					proposedPositions[newPos1.x] = map[int][]int{}
+				}
+				prev, exists := proposedPositions[newPos1.x][newPos1.y]
+				if !exists {
+					prev = make([]int, 0)
+				}
+				prev = append(prev, elfIdx)
+				proposedPositions[newPos1.x][newPos1.y] = prev
+				break
 			}
-			prev, exists := proposedPositions[coord.x][coord.y]
-			if !exists {
-				prev = make([]int, 0)
-			}
-			prev = append(prev, elfIdx)
-			proposedPositions[coord.x][coord.y] = prev
 		}
 	}
-
 	return proposedPositions
 }
 
-func moveElves(elves ElfPosition, moves ProposedPosition) ElfPosition {
+func moveElves(elves ElfPosition, moves ProposedPosition) (ElfPosition, int) {
 	// proposedPositions wants to map positions to lists of elves
+	moveCounts := 0
 	for x, yMap := range moves {
 		for y, movingElves := range yMap {
 			if len(movingElves) == 1 {
 				elves[movingElves[0]] = Coord{x, y}
+				moveCounts++
 			}
 		}
 	}
 
-	return elves
+	return elves, moveCounts
 }
 
-func Part2(data ElfPosition) int {
-	return -1
+func Part2(elves ElfPosition) int {
+	moveCounts := 1
+	iter := 0
+	for moveCounts != 0 {
+		proposedPositions := proposePositions(elves, iter)
+		elves, moveCounts = moveElves(elves, proposedPositions)
+		iter++
+	}
+
+	return iter
 }
