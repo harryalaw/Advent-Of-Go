@@ -114,33 +114,27 @@ func Part1(elves ElfPosition) int {
 	return rectangleArea - len(elves)
 }
 
-func getDirections(round int) [][]Coord {
-	north := Coord{0, -1}
-	northEast := Coord{1, -1}
-	east := Coord{1, 0}
-	southEast := Coord{1, 1}
-	south := Coord{0, 1}
-	southWest := Coord{-1, 1}
-	west := Coord{-1, 0}
-	northWest := Coord{-1, -1}
+var north = &Coord{0, -1}
+var northEast = &Coord{1, -1}
+var east = &Coord{1, 0}
+var southEast = &Coord{1, 1}
+var south = &Coord{0, 1}
+var southWest = &Coord{-1, 1}
+var west = &Coord{-1, 0}
+var northWest = &Coord{-1, -1}
 
-	directions := [][]Coord{
-		{north, northEast, northWest},
-		{south, southEast, southWest},
-		{west, southWest, northWest},
-		{east, southEast, northEast},
-	}
+func getDirections(round int) [][]*Coord {
 	order := round % 4
 	switch order {
 	case 0:
-		return [][]Coord{
+		return [][]*Coord{
 			{north, northEast, northWest},
 			{south, southEast, southWest},
 			{west, southWest, northWest},
 			{east, southEast, northEast},
 		}
 	case 1:
-		return [][]Coord{
+		return [][]*Coord{
 			{south, southEast, southWest},
 			{west, southWest, northWest},
 			{east, southEast, northEast},
@@ -148,22 +142,20 @@ func getDirections(round int) [][]Coord {
 		}
 
 	case 2:
-		return [][]Coord{
+		return [][]*Coord{
 			{west, southWest, northWest},
 			{east, southEast, northEast},
 			{north, northEast, northWest},
 			{south, southEast, southWest},
 		}
-	case 3:
-		return [][]Coord{
+	default:
+		return [][]*Coord{
 			{east, southEast, northEast},
 			{north, northEast, northWest},
 			{south, southEast, southWest},
 			{west, southWest, northWest},
 		}
 	}
-
-	return directions
 }
 
 // map x,y to a an elf index
@@ -182,27 +174,13 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 	proposedPositions := ProposedPosition{}
 
 	for elfIdx, coord := range elves {
-		hasNeighbours := false
-		// this is slow!
-		for i := -1; i <= 1; i++ {
-			for j := -1; j <= 1; j++ {
-				if i == 0 && j == 0 {
-					continue
-				}
-				if _, xExists := occupiedSpaces[coord.x+i]; !xExists {
-					continue
-				}
-				if _, yExists := occupiedSpaces[coord.x+i][coord.y+j]; yExists {
-					hasNeighbours = true
-				}
-			}
-		}
+		hasNeighbours := getNeighbours(coord, &occupiedSpaces)
 
 		if hasNeighbours {
 			for _, direction := range directions {
-				newPos1 := coord.add(&direction[0])
-				newPos2 := coord.add(&direction[1])
-				newPos3 := coord.add(&direction[2])
+				newPos1 := coord.add(direction[0])
+				newPos2 := coord.add(direction[1])
+				newPos3 := coord.add(direction[2])
 				emptySpace := true
 				if occupiedSpaces[newPos1.x][newPos1.y] || occupiedSpaces[newPos2.x][newPos2.y] || occupiedSpaces[newPos3.x][newPos3.y] {
 					emptySpace = false
@@ -225,6 +203,23 @@ func proposePositions(elves ElfPosition, round int) ProposedPosition {
 		}
 	}
 	return proposedPositions
+}
+
+func getNeighbours(coord Coord, occupiedSpaces *map[int](map[int]bool)) bool {
+	for i := -1; i <= 1; i++ {
+		for j := -1; j <= 1; j++ {
+			if i == 0 && j == 0 {
+				continue
+			}
+			if _, xExists := (*occupiedSpaces)[coord.x+i]; !xExists {
+				continue
+			}
+			if _, yExists := (*occupiedSpaces)[coord.x+i][coord.y+j]; yExists {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 func moveElves(elves ElfPosition, moves ProposedPosition) (ElfPosition, int) {
